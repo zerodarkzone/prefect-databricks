@@ -630,6 +630,9 @@ async def jobs_runs_wait_for_completion(
         ```
     """
     logger = get_run_logger()
+    jobs_runs_get_r = jobs_runs_get.with_options(
+        retries=2, retry_delay_seconds=10
+    )
 
     seconds_waited_for_run_completion = 0
     wait_for = []
@@ -637,7 +640,7 @@ async def jobs_runs_wait_for_completion(
     jobs_status = {}
     tasks_status = {}
     while seconds_waited_for_run_completion <= max_wait_seconds:
-        jobs_runs_metadata_future = await jobs_runs_get.submit(
+        jobs_runs_metadata_future = await jobs_runs_get_r.submit(
             run_id=multi_task_jobs_runs_id,
             databricks_credentials=databricks_credentials,
             wait_for=wait_for,
